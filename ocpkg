@@ -72,13 +72,13 @@ UBUNTU_URL=http://releases.ubuntu.com/20.04/
 UBUNTU_MD5SUM=5fdebc435ded46ae99136ca875afc6f05bde217be7dd018e1841924f71db46b5
 UBUNTU_ISO_IMAGE=$CURRENT_DIR/$UBUNTU_ISO #default location
 
-SELF_NAME=$(basename $0)
+SELF_NAME=$(basename "$0")
 TOOL_NAME=octool
 
 GUILEVERSION=3.0.10
 
-PROCESSORS=$(grep "^processor" /proc/cpuinfo | wc -l)
-MAKE_JOBS=$(($PROCESSORS+0))
+PROCESSORS=$(grep -c "^processor" /proc/cpuinfo)
+MAKE_JOBS=$((PROCESSORS+0))
 
 SQUASHFS_OPTIONS="-noDataCompression -noappend" #faster
 SQUASHFS_OPTIONS="-noappend"
@@ -378,8 +378,8 @@ if [ "$SELF_NAME" == "$TOOL_NAME" ] ; then
 else
   echo "Usage: $SELF_NAME [OPTIONS] [PACKAGE-TYPE]"
   echo "  PACKAGE-TYPES:"
-  for key in ${!PACKAGE_DESCRIPTION[@]}; do
-    echo "   " ${key} $'\t' "${PACKAGE_DESCRIPTION[$key]}"
+  for key in "${!PACKAGE_DESCRIPTION[@]}"; do
+    echo "   " "${key}" $'\t' "${PACKAGE_DESCRIPTION[$key]}"
   done
   echo "    (Live CD: Ubuntu ISO image ~700MB will be downloaded if none found.)"
   echo "  OPTIONS:"
@@ -466,7 +466,7 @@ echo -e "\e[1;34m[$SELF_NAME] $MESSAGE\e[0m"
 PACKAGE_TYPE=$DEFAULT_PACKAGE_TYPE
 
 # This handles ./ocpkg runs, for e.g. `./ocpkg debs`
-if [ $1 ] && [ "$SELF_NAME" != "ocpkg" ] ; then
+if [ "$1" ] && [ "$SELF_NAME" != "ocpkg" ] ; then
  case $1 in
    debs)  PACKAGE_TYPE=$1 ;;
    dev)   PACKAGE_TYPE=$1 ;;
@@ -486,23 +486,23 @@ fi
 
 debug() {
 MESSAGE="Dropping to debugging chroot prompt..." ; message
-chroot $LIVE_SQUASH_UNION /bin/bash -l
+chroot "$LIVE_SQUASH_UNION" /bin/bash -l
 }
 
 cleanup_squash() {
 if [ -n "$LIVE_SQUASH_UNION" ]; then
   MESSAGE="Cleaning up squash temp space..." ; message
-  fuser  $VERBOSE --mount $LIVE_SQUASH_UNION -kill
+  fuser  $VERBOSE --mount "$LIVE_SQUASH_UNION" -kill
   sleep  $SLEEP_TIME
-  umount $VERBOSE $LIVE_SQUASH_UNION/var/lib/apt/lists		|| true
-  umount $VERBOSE $LIVE_SQUASH_UNION/var/cache/apt/archives	|| true
-  umount $VERBOSE $LIVE_SQUASH_UNION/proc			|| true
-  umount $VERBOSE $LIVE_SQUASH_UNION/sys			|| true
-  umount $VERBOSE $LIVE_SQUASH_UNION/dev/pts			|| true
-  umount $VERBOSE $LIVE_SQUASH_UNION$LIVE_BUILD_DIR		|| true
-  umount $VERBOSE $LIVE_SQUASH_UNION$LIVE_SOURCE_BRANCH		|| true
+  umount $VERBOSE "$LIVE_SQUASH_UNION"/var/lib/apt/lists		|| true
+  umount $VERBOSE "$LIVE_SQUASH_UNION"/var/cache/apt/archives	|| true
+  umount $VERBOSE "$LIVE_SQUASH_UNION"/proc			|| true
+  umount $VERBOSE "$LIVE_SQUASH_UNION"/sys			|| true
+  umount $VERBOSE "$LIVE_SQUASH_UNION"/dev/pts			|| true
+  umount $VERBOSE "$LIVE_SQUASH_UNION$LIVE_BUILD_DIR"		|| true
+  umount $VERBOSE "$LIVE_SQUASH_UNION$LIVE_SOURCE_BRANCH"		|| true
   MESSAGE="Killing processes..." ; message
-  fuser  $VERBOSE --mount $LIVE_SQUASH_UNION -kill
+  fuser  $VERBOSE --mount "$LIVE_SQUASH_UNION" -kill
   sleep  $SLEEP_TIME
   umount -v -f $VERBOSE $LIVE_SQUASH_UNION			|| true
   rmdir  $VERBOSE $LIVE_SQUASH_UNION				|| true
@@ -515,8 +515,8 @@ fi
 
 if [ -n "$UBUNTU_SQUASH_FILES" ]; then
   echo " $UBUNTU_SQUASH_FILES"
-  umount $VERBOSE $UBUNTU_SQUASH_FILES				|| true
-  rmdir  $VERBOSE $UBUNTU_SQUASH_FILES				|| true
+  umount $VERBOSE "$UBUNTU_SQUASH_FILES"				|| true
+  rmdir  $VERBOSE "$UBUNTU_SQUASH_FILES"				|| true
 fi
 }
 
@@ -536,9 +536,9 @@ fi
 
 if [ -n "$UBUNTU_ISO_FILES" ] ; then
   echo " $UBUNTU_ISO_FILES"
-  umount $VERBOSE $UBUNTU_ISO_FILES				|| true
-  rmdir  $UBUNTU_ISO_FILES					|| true
-  df -m  $UBUNTU_ISO_FILES					|| true
+  umount $VERBOSE "$UBUNTU_ISO_FILES"				|| true
+  rmdir  "$UBUNTU_ISO_FILES"					|| true
+  df -m  "$UBUNTU_ISO_FILES"					|| true
 fi
 }
 
@@ -654,7 +654,7 @@ install_opencog_github_repo() {
   cd /tmp/
   rm -rf master.tar.gz ${REPO}-master/
   rm -rf master.tar.gz ${REPO}-main/
-  cd $CURRENT_DIR
+  cd "$CURRENT_DIR"
 }
 
 # Install cogutil
@@ -728,7 +728,7 @@ install_notebooks() {
 
   echo "export PATH=$PATH:/home/$USER/.local/bin" >> /home/$USER/.bashrc
   echo "source $HOME/.bashrc"
-  cd $CURRENT_DIR
+  cd "$CURRENT_DIR"
 }
 
 # Install additional Python packages
@@ -753,7 +753,7 @@ cd patchelf-0.9
 sudo make install
 cd /tmp
 rm -rf patchelf-0.9
-cd $CURRENT_DIR
+cd "$CURRENT_DIR"
 }
 
 # The following sets the source & build directory for a project
@@ -761,12 +761,12 @@ set_source_and_build_dir() {
 if [ "$(git rev-parse --is-inside-work-tree)" == true ] ; then
     SOURCE_DIR=$(git rev-parse --show-toplevel)
     MESSAGE="Source Directory is set to $SOURCE_DIR" ; message
-    if [ -d $SOURCE_DIR/build ]; then
-        BUILD_DIR=$SOURCE_DIR/build
+    if [ -d "$SOURCE_DIR/build" ]; then
+        BUILD_DIR="$SOURCE_DIR/build"
         MESSAGE="Build Directory is set to $SOURCE_DIR/build" ; message
     else
-        mkdir $SOURCE_DIR/build
-        BUILD_DIR=$SOURCE_DIR/build
+        mkdir "$SOURCE_DIR/build"
+        BUILD_DIR="$SOURCE_DIR/build"
         MESSAGE="Build Directory is set to $SOURCE_DIR/build" ; message
     fi
 else
@@ -779,45 +779,45 @@ fi
 # Build function for cogutil, atomspace & asmoses repos
 build_source() {
   set_source_and_build_dir
-  if [ -a $BUILD_DIR/CMakeCache.txt ]; then
-      rm $BUILD_DIR/CMakeCache.txt
+  if [ -a "$BUILD_DIR/CMakeCache.txt" ]; then
+      rm "$BUILD_DIR/CMakeCache.txt"
       MESSAGE="Removed cmake cache file: rm $BUILD_DIR/CMakeCache.txt" ; message
   fi
   MESSAGE="cmake -B$BUILD_DIR -H$SOURCE_DIR" ; message
   #stackoverflow.com/questions/20610255/how-to-tell-cmake-where-to-put-build-files
-  cmake -B$BUILD_DIR -H$SOURCE_DIR
+  cmake -B"$BUILD_DIR" -H"$SOURCE_DIR"
   MESSAGE="make -C $BUILD_DIR -j$MAKE_JOBS" ; message
-  make -C $BUILD_DIR -j$MAKE_JOBS
+  make -C "$BUILD_DIR" -j"$MAKE_JOBS"
   MESSAGE="Finished building source" ; message
 }
 
 # Build examples function for atomspace & asmoses repos
 build_examples() {
   set_source_and_build_dir
-  if [ -a $BUILD_DIR/CMakeCache.txt ]; then
-      rm $BUILD_DIR/CMakeCache.txt
+  if [ -a "$BUILD_DIR/CMakeCache.txt" ]; then
+      rm "$BUILD_DIR/CMakeCache.txt"
       MESSAGE="Removed cmake cache file: rm $BUILD_DIR/CMakeCache.txt" ; message
   fi
   MESSAGE="cmake -B$BUILD_DIR -H$SOURCE_DIR" ; message
   #stackoverflow.com/questions/20610255/how-to-tell-cmake-where-to-put-build-files
-  cmake -B$BUILD_DIR -H$SOURCE_DIR
+  cmake -B"$BUILD_DIR" -H"$SOURCE_DIR"
   MESSAGE="make -C $BUILD_DIR  -j$MAKE_JOBS examples" ; message
-  make -C $BUILD_DIR -j$MAKE_JOBS examples
+  make -C "$BUILD_DIR" -j"$MAKE_JOBS" examples
   MESSAGE="Finished building examples" ; message
 }
 
 # Run tests function for cogutil, atomspace & asmoses repos
 test_source() {
   set_source_and_build_dir
-  if [ -a $BUILD_DIR/CMakeCache.txt ]; then
-      rm $BUILD_DIR/CMakeCache.txt
+  if [ -a "$BUILD_DIR/CMakeCache.txt" ]; then
+      rm "$BUILD_DIR/CMakeCache.txt"
       MESSAGE="Removed cmake cache file: rm $BUILD_DIR/CMakeCache.txt" ; message
   fi
   MESSAGE="cmake -B$BUILD_DIR -H$SOURCE_DIR" ; message
   #stackoverflow.com/questions/20610255/how-to-tell-cmake-where-to-put-build-files
-  cmake -B$BUILD_DIR -H$SOURCE_DIR
+  cmake -B"$BUILD_DIR" -H"$SOURCE_DIR"
   MESSAGE="make -C $BUILD_DIR -j$MAKE_JOBS test" ; message
-  make -C $BUILD_DIR -j$MAKE_JOBS test #ARGS=-j$MAKE_JOBS
+  make -C "$BUILD_DIR" -j"$MAKE_JOBS" test #ARGS=-j$MAKE_JOBS
   MESSAGE="Finished building & running tests" ; message
 }
 
@@ -825,10 +825,10 @@ test_source() {
 install_build() {
   set_source_and_build_dir
   MESSAGE="Starting installation" ; message
-  cd $BUILD_DIR
+  cd "$BUILD_DIR"
   sudo make install
   sudo ldconfig
-  cd $CURRENT_DIR
+  cd "$CURRENT_DIR"
   MESSAGE="Finished installation" ; message
 }
 
@@ -933,7 +933,7 @@ install_link_grammar(){
   cd /tmp/
   rm -rf link-grammar*
   rm -rf master.tar.gz
-  cd $CURRENT_DIR
+  cd "$CURRENT_DIR"
 }
 
 install_bdwgc() {
@@ -1208,7 +1208,7 @@ UBUNTU_SQUASH_BLOB="$UBUNTU_ISO_FILES/casper/filesystem.squashfs"
 
 if ! [ -e "$UBUNTU_SQUASH_BLOB" ] ; then
   MESSAGE="Could not find the Ubuntu squashfs at '$UBUNTU_SQUASH_BLOB'." ; message
-  umount $VERBOSE $UBUNTU_ISO_FILES || true
+  umount $VERBOSE "$UBUNTU_ISO_FILES" || true
   exit 1
 fi
 
@@ -1244,9 +1244,9 @@ if [ -f /etc/apt/apt.conf.d/01apt-cacher-ng-proxy ] ; then
 fi
 
 cp $0 $LIVE_SQUASH_UNION$PATH_PREFIX/bin/$SELF_NAME ; chmod ugo+rx $LIVE_SQUASH_UNION$PATH_PREFIX/bin/$SELF_NAME
-cd $LIVE_SQUASH_UNION$PATH_PREFIX/bin
-ln -s $SELF_NAME $TOOL_NAME
-cd $CURRENT_DIR
+cd "$LIVE_SQUASH_UNION$PATH_PREFIX/bin"
+ln -s "$SELF_NAME" "$TOOL_NAME"
+cd "$CURRENT_DIR"
 
 MESSAGE="Mounting filesystems..." ; message
 
@@ -1326,11 +1326,11 @@ fi
 
 # option flag conditionals are finished, so set defaults
 
-if [ ! $ADD_REPOSITORIES ] ; then ADD_REPOSITORIES=$DEFAULT_ADD_REPOSITORIES; fi
-if [ ! $INSTALL_DEPENDENCIES ] ; then INSTALL_DEPENDENCIES=$DEFAULT_INSTALL_DEPENDENCIES; fi
-if [ ! $UPDATE_OPENCOG ] ; then UPDATE_OPENCOG=$DEFAULT_UPDATE_OPENCOG; fi
-if [ ! $BUILD_OPENCOG ] ; then BUILD_OPENCOG=$DEFAULT_BUILD_OPENCOG; fi
-if [ ! $TEST_OPENCOG ] ; then TEST_OPENCOG=$DEFAULT_TEST_OPENCOG; fi
+if [ ! "$ADD_REPOSITORIES" ] ; then ADD_REPOSITORIES=$DEFAULT_ADD_REPOSITORIES; fi
+if [ ! "$INSTALL_DEPENDENCIES" ] ; then INSTALL_DEPENDENCIES=$DEFAULT_INSTALL_DEPENDENCIES; fi
+if [ ! "$UPDATE_OPENCOG" ] ; then UPDATE_OPENCOG=$DEFAULT_UPDATE_OPENCOG; fi
+if [ ! "$BUILD_OPENCOG" ] ; then BUILD_OPENCOG=$DEFAULT_BUILD_OPENCOG; fi
+if [ ! "$TEST_OPENCOG" ] ; then TEST_OPENCOG=$DEFAULT_TEST_OPENCOG; fi
 
 # package type selected when invoked as 'ocpkg'
 
@@ -1350,9 +1350,9 @@ esac
 
 case $PACKAGE_TYPE in
   local) if [ $UPDATE_OPENCOG ] ; then update_opencog_source ; fi ;;
-  demo)  if [ $UPDATE_OPENCOG ] ; then chroot $LIVE_SQUASH_UNION $PATH_PREFIX/bin/$TOOL_NAME $VERBOSE -u ; fi ;;
-  min)   if [ $UPDATE_OPENCOG ] ; then chroot $LIVE_SQUASH_UNION $PATH_PREFIX/bin/$TOOL_NAME $VERBOSE -u ; fi ;;
-  dev)   if [ $UPDATE_OPENCOG ] ; then chroot $LIVE_SQUASH_UNION $PATH_PREFIX/bin/$TOOL_NAME $VERBOSE -u ; fi ;;
+  demo)  if [ "$UPDATE_OPENCOG" ] ; then chroot "$LIVE_SQUASH_UNION" "$PATH_PREFIX/bin/$TOOL_NAME" $VERBOSE -u ; fi ;;
+  min)   if [ "$UPDATE_OPENCOG" ] ; then chroot "$LIVE_SQUASH_UNION" "$PATH_PREFIX/bin/$TOOL_NAME" $VERBOSE -u ; fi ;;
+  dev)   if [ "$UPDATE_OPENCOG" ] ; then chroot "$LIVE_SQUASH_UNION" "$PATH_PREFIX/bin/$TOOL_NAME" $VERBOSE -u ; fi ;;
 esac
 
 case $PACKAGE_TYPE in
