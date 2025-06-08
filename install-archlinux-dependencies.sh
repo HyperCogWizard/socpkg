@@ -10,7 +10,7 @@
 set -e
 
 # Environment Variables
-SELF_NAME=$(basename $0)
+SELF_NAME=$(basename "$0")
 
 PACKAGES_TOOLS="
  		git \
@@ -76,7 +76,7 @@ cd json_spirit_v4_05
 mkdir build
 cd build/
 cmake ..
-make -j$(nproc)
+make -j"$(nproc)"
 sudo make install
 cd ../..
 rm -rf json-spirit_4.05.orig.tar.gz json_spirit_v4_05
@@ -123,7 +123,7 @@ cd atomspace-master/
 mkdir build
 cd build/
 cmake ..
-make -j$(nproc)
+make -j"$(nproc)"
 sudo make install
 cd ../..
 rm -rf master.tar.gz atomspace-master/

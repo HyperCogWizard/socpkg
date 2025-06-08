@@ -8,9 +8,9 @@
 # trap errors
 set -e
 
-SELF_NAME=$(basename $0)
-PROCESSORS=$(grep "^processor" /proc/cpuinfo | wc -l)
-MAKE_JOBS=$(($PROCESSORS+0))
+SELF_NAME=$(basename "$0")
+PROCESSORS=$(grep -c "^processor" /proc/cpuinfo)
+MAKE_JOBS=$((PROCESSORS+0))
 
 VERBOSE="-v"
 QUIET="-qq"
@@ -80,7 +80,7 @@ PACKAGES_RUNTIME="
 OPENCOG_CMAKE_PROJECTS=(cogutil atomspace opencog moses ros-behavior-scripting)
 
 message() {
-    printf "\e[1;34m[$SELF_NAME] $MESSAGE\e[0m \n"
+    printf '\e[1;34m[%s] %s\e[0m \n' "$SELF_NAME" "$MESSAGE"
 }
 
 is_x68_64() {
@@ -120,10 +120,10 @@ install_opencog_python_packages(){
     # long time as they have to be built before being installed. And the
     # arrifacts of the build occupies a lot of space blotting the docker image.
     # Thus instead a system instllation is made.
-    sudo pip install -U $(awk '!/scipy/&&!/numpy/&&!/matplotlib/' requirements.txt)
+    sudo pip install -U "$(awk '!/scipy/&&!/numpy/&&!/matplotlib/' requirements.txt)"
     sudo apt-get install -y python-matplotlib python-numpy python-scipy
     rm -f requirements.txt*
-    cd $CURRENT_DIR
+    cd "$CURRENT_DIR"
 }
 
 # Install Haskell Dependencies
@@ -134,14 +134,14 @@ install_haskell_dependencies(){
       sudo apt-get install -y curl
       cd /tmp
       rm -rf stack*
-      wget $(curl -s  https://api.github.com/repos/commercialhaskell/stack/releases/latest | awk '/browser_download_url/&&/i386-linux.tar.gz/' | head -n 1 | cut -d '"' -f 4)
+      wget "$(curl -s  https://api.github.com/repos/commercialhaskell/stack/releases/latest | awk '/browser_download_url/&&/i386-linux.tar.gz/' | head -n 1 | cut -d '"' -f 4)"
       tar xfz stack*i386-linux.tar.gz
       rm stack*i386-linux.tar.gz
       mv stack* stack
       chmod 755 stack
       sudo mv stack /usr/bin/stack
       rm -f stack*
-      cd $CURRENT_DIR
+      cd "$CURRENT_DIR"
     else
       MESSAGE="Installing haskell dependencies in user space...." ; message
       # Install stack.

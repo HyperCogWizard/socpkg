@@ -72,13 +72,13 @@ UBUNTU_URL=http://releases.ubuntu.com/20.04/
 UBUNTU_MD5SUM=5fdebc435ded46ae99136ca875afc6f05bde217be7dd018e1841924f71db46b5
 UBUNTU_ISO_IMAGE=$CURRENT_DIR/$UBUNTU_ISO #default location
 
-SELF_NAME=$(basename $0)
+SELF_NAME=$(basename "$0")
 TOOL_NAME=octool
 
 GUILEVERSION=3.0.10
 
-PROCESSORS=$(grep "^processor" /proc/cpuinfo | wc -l)
-MAKE_JOBS=$(($PROCESSORS+0))
+PROCESSORS=$(grep -c "^processor" /proc/cpuinfo)
+MAKE_JOBS=$((PROCESSORS+0))
 
 SQUASHFS_OPTIONS="-noDataCompression -noappend" #faster
 SQUASHFS_OPTIONS="-noappend"
@@ -378,8 +378,8 @@ if [ "$SELF_NAME" == "$TOOL_NAME" ] ; then
 else
   echo "Usage: $SELF_NAME [OPTIONS] [PACKAGE-TYPE]"
   echo "  PACKAGE-TYPES:"
-  for key in ${!PACKAGE_DESCRIPTION[@]}; do
-    echo "   " ${key} $'\t' "${PACKAGE_DESCRIPTION[$key]}"
+  for key in "${!PACKAGE_DESCRIPTION[@]}"; do
+    echo "   " "${key}" $'\t' "${PACKAGE_DESCRIPTION[$key]}"
   done
   echo "    (Live CD: Ubuntu ISO image ~700MB will be downloaded if none found.)"
   echo "  OPTIONS:"
@@ -654,7 +654,7 @@ install_opencog_github_repo() {
   cd /tmp/
   rm -rf master.tar.gz ${REPO}-master/
   rm -rf master.tar.gz ${REPO}-main/
-  cd $CURRENT_DIR
+  cd "$CURRENT_DIR"
 }
 
 # Install cogutil
@@ -728,7 +728,7 @@ install_notebooks() {
 
   echo "export PATH=$PATH:/home/$USER/.local/bin" >> /home/$USER/.bashrc
   echo "source $HOME/.bashrc"
-  cd $CURRENT_DIR
+  cd "$CURRENT_DIR"
 }
 
 # Install additional Python packages
@@ -753,7 +753,7 @@ cd patchelf-0.9
 sudo make install
 cd /tmp
 rm -rf patchelf-0.9
-cd $CURRENT_DIR
+cd "$CURRENT_DIR"
 }
 
 # The following sets the source & build directory for a project
@@ -825,10 +825,10 @@ test_source() {
 install_build() {
   set_source_and_build_dir
   MESSAGE="Starting installation" ; message
-  cd $BUILD_DIR
+  cd "$BUILD_DIR"
   sudo make install
   sudo ldconfig
-  cd $CURRENT_DIR
+  cd "$CURRENT_DIR"
   MESSAGE="Finished installation" ; message
 }
 
@@ -933,7 +933,7 @@ install_link_grammar(){
   cd /tmp/
   rm -rf link-grammar*
   rm -rf master.tar.gz
-  cd $CURRENT_DIR
+  cd "$CURRENT_DIR"
 }
 
 install_bdwgc() {
@@ -1244,9 +1244,9 @@ if [ -f /etc/apt/apt.conf.d/01apt-cacher-ng-proxy ] ; then
 fi
 
 cp $0 $LIVE_SQUASH_UNION$PATH_PREFIX/bin/$SELF_NAME ; chmod ugo+rx $LIVE_SQUASH_UNION$PATH_PREFIX/bin/$SELF_NAME
-cd $LIVE_SQUASH_UNION$PATH_PREFIX/bin
-ln -s $SELF_NAME $TOOL_NAME
-cd $CURRENT_DIR
+cd "$LIVE_SQUASH_UNION$PATH_PREFIX/bin"
+ln -s "$SELF_NAME" "$TOOL_NAME"
+cd "$CURRENT_DIR"
 
 MESSAGE="Mounting filesystems..." ; message
 
