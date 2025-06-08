@@ -250,12 +250,12 @@ set_source_and_build_dir() {
     fi
 
     # Set build directory path
-    if [ -d $SOURCE_DIR/build ]; then
-        BUILD_DIR=$SOURCE_DIR/build
+    if [ -d "$SOURCE_DIR/build" ]; then
+        BUILD_DIR="$SOURCE_DIR/build"
         MESSAGE="Build Directory is set to $SOURCE_DIR/build" ; message
     else
-        mkdir $SOURCE_DIR/build
-        BUILD_DIR=$SOURCE_DIR/build
+        mkdir "$SOURCE_DIR/build"
+        BUILD_DIR="$SOURCE_DIR/build"
         MESSAGE="Build Directory is set to $SOURCE_DIR/build" ; message
     fi
 }
@@ -666,31 +666,31 @@ esac
 
 # This is mainly for configuring workspaces depending on the type
 # of project being worked on. The order here matters.
-if [ $ADD_REPOSITORIES ] ; then add_repositories ; fi
-if [ $INSTALL_DEPENDENCIES ] ; then install_dependencies ; fi
-if [ $HASKELL_STACK_SETUP ] ; then install_haskell_dependencies ; fi
-if [ $INSTALL_OPENCOG_PYTHON_PACKAGES ] ; then
+if [ "$ADD_REPOSITORIES" ] ; then add_repositories ; fi
+if [ "$INSTALL_DEPENDENCIES" ] ; then install_dependencies ; fi
+if [ "$HASKELL_STACK_SETUP" ] ; then install_haskell_dependencies ; fi
+if [ "$INSTALL_OPENCOG_PYTHON_PACKAGES" ] ; then
     install_opencog_python_packages
 fi
-if [ $INSTALL_COGUTIL ] ; then
+if [ "$INSTALL_COGUTIL" ] ; then
     install_opencog_cmake_project cogutil
 fi
-if [ $INSTALL_ATOMSPACE ] ; then
+if [ "$INSTALL_ATOMSPACE" ] ; then
     install_opencog_cmake_project atomspace
 fi
-if [ $INSTALL_LINK_GRAMMAR ] ; then install_link_grammar ; fi
-if [ $INSTALL_MOSES ] ; then
+if [ "$INSTALL_LINK_GRAMMAR" ] ; then install_link_grammar ; fi
+if [ "$INSTALL_MOSES" ] ; then
     install_opencog_cmake_project moses
 fi
-if [ $BUILD_ALL ] ; then
+if [ "$BUILD_ALL" ] ; then
     BUILD_SOURCE=true
     BUILD_EXAMPLES=true
     BUILD_TESTS=true
 fi
-if [ $BUILD_SOURCE ] ; then build_source ; fi
-if [ $BUILD_EXAMPLES ] ; then build_examples ; fi
-if [ $BUILD_TESTS ] ; then build_tests ; fi
-if [ $RUN_TESTS ] ; then run_tests ; fi
-if [ $INSTALL_BUILD ] ; then install_build ; fi
-if [ $UNKNOWN_FLAGS ] ; then usage ; fi
+if [ "$BUILD_SOURCE" ] ; then build_source ; fi
+if [ "$BUILD_EXAMPLES" ] ; then build_examples ; fi
+if [ "$BUILD_TESTS" ] ; then build_tests ; fi
+if [ "$RUN_TESTS" ] ; then run_tests ; fi
+if [ "$INSTALL_BUILD" ] ; then install_build ; fi
+if [ "$UNKNOWN_FLAGS" ] ; then usage ; fi
 exit 0
